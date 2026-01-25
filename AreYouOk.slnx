@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AreYouOk.API/AreYouOk.API.csproj" />
+  <Project Path="AreYouOk.MobileApp/AreYouOk.MobileApp.csproj" />
+  <Project Path="AreYouOk.Shared/AreYouOk.Shared.csproj" />
+</Solution>

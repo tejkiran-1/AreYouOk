@@ -1,0 +1,25 @@
+﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:AreYouOk.MobileApp.Converters"
+             x:Class="AreYouOk.MobileApp.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Value Converters -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter" />
+            <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
+            <converters:JourneyStatusToEmojiConverter x:Key="JourneyStatusToEmojiConverter" />
+            <converters:JourneyStatusToColorConverter x:Key="JourneyStatusToColorConverter" />
+            <converters:JourneyStatusToBorderColorConverter x:Key="JourneyStatusToBorderColorConverter" />
+            <converters:JourneyStatusIsAlertConverter x:Key="JourneyStatusIsAlertConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+

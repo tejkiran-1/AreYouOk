@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:AreYouOk.MobileApp.ViewModels"
+             x:Class="AreYouOk.MobileApp.Pages.StartJourneyPage"
+             x:DataType="viewmodels:StartJourneyViewModel"
+             Title="Start Journey"
+             Shell.PresentationMode="ModalAnimated">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Header -->
+            <Label Text="🚀 Start New Journey"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
+
+            <Label Text="Add your family members who will be notified about your safety status"
+                   FontSize="14"
+                   TextColor="{StaticResource Gray600}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,10" />
+
+            <!-- Check-in Interval -->
+            <Frame CornerRadius="15"
+                   Padding="20"
+                   BackgroundColor="{StaticResource Surface}"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="⏰ Check-in Interval"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+                    
+                    <Label Text="How often should you check in? (hours)"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray600}" />
+
+                    <HorizontalStackLayout Spacing="10">
+                        <Stepper Value="{Binding CheckInIntervalHours}"
+                                 Minimum="0.5"
+                                 Maximum="168"
+                                 Increment="0.5"
+                                 HorizontalOptions="Start" />
+                        <Label Text="{Binding CheckInIntervalHours, StringFormat='{0:F1} hours'}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <Label Text="💡 Tip: Set a realistic interval based on your journey duration"
+                           FontSize="12"
+                           TextColor="{StaticResource Gray500}"
+                           Margin="0,5,0,0" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Add Family Member -->
+            <Frame CornerRadius="15"
+                   Padding="20"
+                   BackgroundColor="{StaticResource Surface}"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="👨‍👩‍👧‍👦 Add Family Members"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+
+                    <Label Text="Phone Number"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray600}" />
+                    <Entry Text="{Binding NewPhoneNumber}"
+                           Placeholder="+1 (555) 123-4567"
+                           Keyboard="Telephone"
+                           FontSize="16"
+                           ReturnType="Next" />
+
+                    <Label Text="Display Name (Optional)"
+                           FontSize="14"
+                           TextColor="{StaticResource Gray600}" />
+                    <Entry Text="{Binding NewDisplayName}"
+                           Placeholder="Mom, Dad, etc."
+                           FontSize="16"
+                           ReturnType="Done" />
+
+                    <Button Text="➕ Add Member"
+                            Command="{Binding AddFamilyMemberCommand}"
+                            BackgroundColor="{StaticResource Accent}"
+                            TextColor="White"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="45"
+                            CornerRadius="22" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Family Members List -->
+            <Frame CornerRadius="15"
+                   Padding="20"
+                   BackgroundColor="{StaticResource Surface}"
+                   HasShadow="True"
+                   IsVisible="{Binding FamilyMembers.Count, Converter={StaticResource IntToBoolConverter}}">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Added Family Members"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+
+                    <CollectionView ItemsSource="{Binding FamilyMembers}"
+                                    HeightRequest="200">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame CornerRadius="10"
+                                       Padding="15"
+                                       Margin="0,5,0,5"
+                                       BackgroundColor="{StaticResource Background}"
+                                       HasShadow="False"
+                                       BorderColor="{StaticResource Gray200}">
+                                    <Grid ColumnDefinitions="*,Auto" 
+                                          ColumnSpacing="10">
+                                        <VerticalStackLayout Grid.Column="0" 
+                                                           Spacing="5"
+                                                           VerticalOptions="Center">
+                                            <Label Text="{Binding DisplayName}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}" />
+                                            <Label Text="{Binding PhoneNumber}"
+                                                   FontSize="14"
+                                                   TextColor="{StaticResource Gray600}" />
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1"
+                                                Text="✕"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:StartJourneyViewModel}}, Path=RemoveFamilyMemberCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="{StaticResource Error}"
+                                                TextColor="White"
+                                                FontSize="16"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                CornerRadius="20"
+                                                Padding="0"
+                                                VerticalOptions="Center" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Error Message -->
+            <Label Text="{Binding ErrorMessage}"
+                   TextColor="{StaticResource Error}"
+                   FontSize="14"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0" />
+
+            <!-- Action Buttons -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,20">
+                <Button Grid.Column="0"
+                        Text="Cancel"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="{StaticResource Gray300}"
+                        TextColor="{StaticResource Gray900}"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        HeightRequest="55"
+                        CornerRadius="27" />
+
+                <Button Grid.Column="1"
+                        Text="Start Journey"
+                        Command="{Binding StartJourneyCommand}"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontSize="16"
+                        FontAttributes="Bold"
+                        HeightRequest="55"
+                        CornerRadius="27" />
+            </Grid>
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                              IsVisible="{Binding IsLoading}"
+                              Color="{StaticResource Primary}"
+                              HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

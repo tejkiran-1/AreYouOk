@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:AreYouOk.MobileApp.ViewModels"
+             x:Class="AreYouOk.MobileApp.Pages.HistoryPage"
+             x:DataType="viewmodels:HistoryViewModel"
+             Title="Journey History">
+
+    <RefreshView IsRefreshing="{Binding IsLoading}"
+                 Command="{Binding RefreshCommand}">
+        <Grid>
+            <!-- Journey List -->
+            <CollectionView ItemsSource="{Binding Journeys}"
+                           IsVisible="{Binding IsEmpty, Converter={StaticResource InvertedBoolConverter}}"
+                           Margin="10">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="15"
+                               Padding="20"
+                               Margin="10,5"
+                               BackgroundColor="{StaticResource Surface}"
+                               HasShadow="True">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer 
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HistoryViewModel}}, Path=ViewJourneyDetailsCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Frame.GestureRecognizers>
+                            
+                            <Grid ColumnDefinitions="60,*,Auto" ColumnSpacing="15">
+                                <!-- Icon -->
+                                <Frame Grid.Column="0"
+                                       WidthRequest="60"
+                                       HeightRequest="60"
+                                       CornerRadius="30"
+                                       Padding="0"
+                                       BackgroundColor="{StaticResource Primary}"
+                                       HasShadow="False">
+                                    <Label Text="{Binding Status, Converter={StaticResource JourneyStatusToEmojiConverter}}"
+                                           FontSize="30"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Frame>
+
+                                <!-- Journey Info -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="5">
+                                    <Label Text="{Binding StartTime, StringFormat='Journey on {0:MMM dd, yyyy}'}"
+                                           FontSize="16"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding StartTime, StringFormat='Started: {0:hh:mm tt}'}"
+                                           FontSize="14"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <Label Text="{Binding EndTime, StringFormat='Ended: {0:hh:mm tt}'}"
+                                           FontSize="14"
+                                           TextColor="{StaticResource Gray600}" />
+                                    <HorizontalStackLayout Spacing="5">
+                                        <Label Text="👥"
+                                               FontSize="12" />
+                                        <Label Text="{Binding FamilyMembers.Count, StringFormat='{0} members'}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource Gray600}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <!-- Status Badge -->
+                                <Frame Grid.Column="2"
+                                       Padding="10,5"
+                                       CornerRadius="12"
+                                       BackgroundColor="{Binding Status, Converter={StaticResource JourneyStatusToColorConverter}}"
+                                       HasShadow="False"
+                                       VerticalOptions="Start">
+                                    <Label Text="{Binding Status}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="White" />
+                                </Frame>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Empty State -->
+            <VerticalStackLayout IsVisible="{Binding isEmpty}"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
+                                Spacing="20"
+                                Padding="40">
+                <Label Text="📜"
+                       FontSize="80"
+                       HorizontalOptions="Center" />
+                <Label Text="{Binding EmptyMessage}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource Gray600}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+                <Label Text="Your completed journeys will appear here"
+                       FontSize="14"
+                       TextColor="{StaticResource Gray500}"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </RefreshView>
+
+</ContentPage>
