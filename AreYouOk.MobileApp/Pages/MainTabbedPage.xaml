@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <TabbedPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-            xmlns:pages="clr-namespace:AreYouOk.MobileApp.Pages"
             x:Class="AreYouOk.MobileApp.Pages.MainTabbedPage"
             BarBackgroundColor="#6200EE"
             BarTextColor="White"
             SelectedTabColor="White"
             UnselectedTabColor="#B39DDB">
-    
-    <pages:HomePage Title="Home" IconImageSource="🏠" />
-    <pages:HistoryPage Title="History" IconImageSource="📜" />
-    <pages:MonitorPage Title="Monitor" IconImageSource="👥" />
-    <pages:ProfilePage Title="Profile" IconImageSource="👤" />
-    
+    <!-- Pages are added programmatically in code-behind to support DI -->
 </TabbedPage>

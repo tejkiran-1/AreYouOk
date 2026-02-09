@@ -17,7 +17,7 @@
                        BackgroundColor="{StaticResource Primary}"
                        HasShadow="True">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding UserName, StringFormat='Welcome, {0}!'}"
+                        <Label Text="{Binding UserName, StringFormat=&quot;Welcome, {0}!&quot;}"
                                FontSize="24"
                                FontAttributes="Bold"
                                TextColor="White" />
@@ -87,7 +87,7 @@
                                    FontSize="14"
                                    TextColor="{StaticResource Gray600}" />
                             <Label Grid.Row="0" Grid.Column="1"
-                                   Text="{Binding ActiveJourney.StartTime, StringFormat='{0:hh:mm tt}'}"
+                                   Text="{Binding ActiveJourney.StartTime, StringFormat=&quot;{0:hh:mm tt}&quot;}"
                                    FontSize="14"
                                    FontAttributes="Bold" />
 
@@ -96,7 +96,7 @@
                                    FontSize="14"
                                    TextColor="{StaticResource Gray600}" />
                             <Label Grid.Row="1" Grid.Column="1"
-                                   Text="{Binding ActiveJourney.FamilyMembers.Count, StringFormat='{0} members'}"
+                                   Text="{Binding ActiveJourney.FamilyMembers.Count, StringFormat=&quot;{0} members&quot;}"
                                    FontSize="14"
                                    FontAttributes="Bold" />
 
@@ -105,7 +105,7 @@
                                    FontSize="14"
                                    TextColor="{StaticResource Gray600}" />
                             <Label Grid.Row="2" Grid.Column="1"
-                                   Text="{Binding ActiveJourney.CheckInIntervalHours, StringFormat='Every {0:F2} hours'}"
+                                   Text="{Binding ActiveJourney.CheckInIntervalHours, StringFormat=&quot;Every {0:F2} hours&quot;}"
                                    FontSize="14"
                                    FontAttributes="Bold" />
                         </Grid>

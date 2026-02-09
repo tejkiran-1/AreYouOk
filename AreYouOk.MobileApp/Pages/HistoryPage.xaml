@@ -43,19 +43,19 @@
 
                                 <!-- Journey Info -->
                                 <VerticalStackLayout Grid.Column="1" Spacing="5">
-                                    <Label Text="{Binding StartTime, StringFormat='Journey on {0:MMM dd, yyyy}'}"
+                                    <Label Text="{Binding StartTime, StringFormat=&quot;Journey on {0:MMM dd, yyyy}&quot;}"
                                            FontSize="16"
                                            FontAttributes="Bold" />
-                                    <Label Text="{Binding StartTime, StringFormat='Started: {0:hh:mm tt}'}"
+                                    <Label Text="{Binding StartTime, StringFormat=&quot;Started: {0:hh:mm tt}&quot;}"
                                            FontSize="14"
                                            TextColor="{StaticResource Gray600}" />
-                                    <Label Text="{Binding EndTime, StringFormat='Ended: {0:hh:mm tt}'}"
+                                    <Label Text="{Binding EndTime, StringFormat=&quot;Ended: {0:hh:mm tt}&quot;}"
                                            FontSize="14"
                                            TextColor="{StaticResource Gray600}" />
                                     <HorizontalStackLayout Spacing="5">
                                         <Label Text="👥"
                                                FontSize="12" />
-                                        <Label Text="{Binding FamilyMembers.Count, StringFormat='{0} members'}"
+                                        <Label Text="{Binding FamilyMembers.Count, StringFormat=&quot;{0} members&quot;}"
                                                FontSize="12"
                                                TextColor="{StaticResource Gray600}" />
                                     </HorizontalStackLayout>

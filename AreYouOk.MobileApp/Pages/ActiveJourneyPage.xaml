@@ -32,7 +32,7 @@
                                      ProgressColor="White"
                                      BackgroundColor="#FFFFFF40"
                                      HeightRequest="8" />
-                        <Label Text="{Binding ProgressValue, StringFormat='Progress: {0:P0}'}"
+                        <Label Text="{Binding ProgressValue, StringFormat=&quot;Progress: {0:P0}&quot;}"
                                FontSize="12"
                                TextColor="White"
                                HorizontalOptions="Center"
@@ -104,7 +104,7 @@
                                FontSize="14"
                                TextColor="{StaticResource Gray600}" />
                         <Label Grid.Row="0" Grid.Column="1"
-                               Text="{Binding Journey.StartTime, StringFormat='{0:g}'}"
+                               Text="{Binding Journey.StartTime, StringFormat=&quot;{0:g}&quot;}"
                                FontSize="14"
                                FontAttributes="Bold" />
 
@@ -113,7 +113,7 @@
                                FontSize="14"
                                TextColor="{StaticResource Gray600}" />
                         <Label Grid.Row="1" Grid.Column="1"
-                               Text="{Binding Journey.CheckInIntervalHours, StringFormat='Every {0:F1} hours'}"
+                               Text="{Binding Journey.CheckInIntervalHours, StringFormat=&quot;Every {0:F1} hours&quot;}"
                                FontSize="14"
                                FontAttributes="Bold" />
 
@@ -122,7 +122,7 @@
                                FontSize="14"
                                TextColor="{StaticResource Gray600}" />
                         <Label Grid.Row="2" Grid.Column="1"
-                               Text="{Binding Journey.LastCheckInTime, StringFormat='{0:t}'}"
+                               Text="{Binding Journey.LastCheckInTime, StringFormat=&quot;{0:t}&quot;}"
                                FontSize="14"
                                FontAttributes="Bold" />
 

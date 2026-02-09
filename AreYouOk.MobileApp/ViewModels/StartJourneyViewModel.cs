@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AreYouOk.MobileApp.Services;
+using AreYouOk.MobileApp.Models;
 using AreYouOk.Shared.DTOs;
 using System.Collections.ObjectModel;
 
@@ -165,13 +166,4 @@ public partial class StartJourneyViewModel : ObservableObject
             await Shell.Current.GoToAsync("//home");
         }
     }
-}
-
-/// <summary>
-/// Helper class for family member input
-/// </summary>
-public class FamilyMemberInput
-{
-    public string PhoneNumber { get; set; } = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
 }

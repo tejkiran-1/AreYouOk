@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AreYouOk.MobileApp.Services;
+using AreYouOk.MobileApp.Pages;
 
 namespace AreYouOk.MobileApp.ViewModels;
 
@@ -57,13 +58,8 @@ if (Application.Current?.MainPage == null)
         {
             _settingsService.ClearUserData();
             
-            // Hide TabBar and show login routes
-            if (Application.Current?.MainPage is AppShell shell)
-            {
-                shell.ShowLoginPage();
-            }
-            
-            await Shell.Current.GoToAsync("//login");
+            // Navigate back to AppShell (login page) after logout
+            Application.Current.MainPage = new AppShell();
         }
     }
 

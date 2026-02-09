@@ -44,7 +44,7 @@
 
                                 <!-- User Info -->
                                 <VerticalStackLayout Grid.Column="1" Grid.Row="0" Spacing="5">
-                                    <Label Text="{Binding User.FirstName, StringFormat='{0}''s Journey'}"
+                                    <Label Text="{Binding User.FirstName, StringFormat=&quot;{0}'s Journey&quot;}"
                                            FontSize="18"
                                            FontAttributes="Bold" />
                                     <Label Text="{Binding User.PhoneNumber}"
@@ -75,7 +75,7 @@
                                     <HorizontalStackLayout Spacing="5">
                                         <Label Text="🕒"
                                                FontSize="12" />
-                                        <Label Text="{Binding StartTime, StringFormat='Started {0:hh:mm tt}'}"
+                                        <Label Text="{Binding StartTime, StringFormat=&quot;Started {0:hh:mm tt}&quot;}"
                                                FontSize="12"
                                                TextColor="{StaticResource Gray600}" />
                                     </HorizontalStackLayout>

@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AreYouOk.MobileApp.Services;
+using AreYouOk.MobileApp.Pages;
 using AreYouOk.Shared.DTOs;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AreYouOk.MobileApp.ViewModels;
 
@@ -13,6 +15,7 @@ public class HomeViewModel : ObservableObject
 {
     private readonly ApiClient _apiClient;
     private readonly SettingsService _settingsService;
+    private readonly IServiceProvider _serviceProvider;
 
     private string userName = string.Empty;
     public string UserName
@@ -49,10 +52,11 @@ public class HomeViewModel : ObservableObject
         set => SetProperty(ref statusMessage, value);
     }
 
-    public HomeViewModel(ApiClient apiClient, SettingsService settingsService)
+    public HomeViewModel(ApiClient apiClient, SettingsService settingsService, IServiceProvider serviceProvider)
     {
         _apiClient = apiClient;
         _settingsService = settingsService;
+        _serviceProvider = serviceProvider;
         
         // Initialize user name safely
         UserName = _settingsService.UserFirstName ?? "User";
@@ -70,7 +74,8 @@ public class HomeViewModel : ObservableObject
                 try
                 {
                     System.Diagnostics.Debug.WriteLine($"Navigating to activejourney. Journey ID: {ActiveJourney.Id}");
-                    await Shell.Current.GoToAsync("activejourney");
+                    var activeJourneyPage = _serviceProvider.GetRequiredService<ActiveJourneyPage>();
+                    await Application.Current.MainPage.Navigation.PushModalAsync(activeJourneyPage);
                     System.Diagnostics.Debug.WriteLine("Navigation successful");
                 }
                 catch (Exception ex)
@@ -126,7 +131,8 @@ public class HomeViewModel : ObservableObject
         try
         {
             System.Diagnostics.Debug.WriteLine("Navigating to startjourney");
-            await Shell.Current.GoToAsync("startjourney");
+            var startJourneyPage = _serviceProvider.GetRequiredService<StartJourneyPage>();
+            await Application.Current.MainPage.Navigation.PushModalAsync(startJourneyPage);
         }
         catch (Exception ex)
         {

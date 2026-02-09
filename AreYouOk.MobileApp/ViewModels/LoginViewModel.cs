@@ -1,18 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using AreYouOk.MobileApp.Services;
+using AreYouOk.MobileApp.Data;
+using AreYouOk.MobileApp.Data.Entities;
 using AreYouOk.Shared.DTOs;
+using System.Diagnostics;
 
 namespace AreYouOk.MobileApp.ViewModels;
 
-/// <summary>
-/// ViewModel for the Login page
-/// Example implementation showing MVVM pattern
-/// </summary>
 public partial class LoginViewModel : ObservableObject
 {
     private readonly ApiClient _apiClient;
     private readonly SettingsService _settingsService;
+    private readonly DatabaseService _databaseService;
+    private readonly NavigationService _navigationService;
 
     [ObservableProperty]
     private string email = string.Empty;
@@ -26,10 +27,21 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private string errorMessage = string.Empty;
 
-    public LoginViewModel(ApiClient apiClient, SettingsService settingsService)
+    [ObservableProperty]
+    private bool rememberMe = true;
+
+    public LoginViewModel(
+        ApiClient apiClient,
+        SettingsService settingsService,
+        DatabaseService databaseService,
+        NavigationService navigationService)
     {
         _apiClient = apiClient;
         _settingsService = settingsService;
+        _databaseService = databaseService;
+        _navigationService = navigationService;
+        
+        Debug.WriteLine("[LoginViewModel] Initialized");
     }
 
     [RelayCommand]
@@ -46,6 +58,8 @@ public partial class LoginViewModel : ObservableObject
 
         try
         {
+            Debug.WriteLine($"[LoginViewModel] Attempting login for {Email}");
+            
             var loginDto = new LoginDto
             {
                 Email = Email,
@@ -56,30 +70,49 @@ public partial class LoginViewModel : ObservableObject
 
             if (result.Success && result.Data != null)
             {
-                // Save user data
-                _settingsService.AuthToken = result.Data.Token;
-                _settingsService.UserId = result.Data.UserId;
-                _settingsService.UserEmail = result.Data.Email;
-                _settingsService.UserFirstName = result.Data.FirstName;
-                _settingsService.UserLastName = result.Data.LastName;
+                Debug.WriteLine("[LoginViewModel] Login successful");
+                
+                // Save user session to preferences
+                _settingsService.SaveUserSession(
+                    result.Data.UserId,
+                    result.Data.Email,
+                    result.Data.FirstName,
+                    result.Data.LastName,
+                    result.Data.Token,
+                    DateTime.UtcNow.AddDays(30) // Token expires in 30 days
+                );
 
-                // Show TabBar and hide login routes
-                if (Application.Current?.MainPage is AppShell shell)
+                // Save user to local database
+                if (RememberMe)
                 {
-                    shell.ShowTabBar();
+                    var userEntity = new UserEntity
+                    {
+                        ServerId = result.Data.UserId,
+                        Email = result.Data.Email,
+                        FirstName = result.Data.FirstName,
+                        LastName = result.Data.LastName,
+                        AuthToken = result.Data.Token,
+                        TokenExpiresAt = DateTime.UtcNow.AddDays(30),
+                        IsActive = true
+                    };
+                    
+                    await _databaseService.SaveUserAsync(userEntity);
+                    Debug.WriteLine("[LoginViewModel] User saved to local database");
                 }
 
-                // Navigate to home page
-                await Shell.Current.GoToAsync("//home");
+                // Navigate to main page
+                await _navigationService.NavigateToMainAsync();
             }
             else
             {
-                ErrorMessage = result.ErrorMessage ?? "Login failed";
+                ErrorMessage = result.ErrorMessage ?? "Login failed. Please check your credentials.";
+                Debug.WriteLine($"[LoginViewModel] Login failed: {ErrorMessage}");
             }
         }
         catch (Exception ex)
         {
-            ErrorMessage = $"Error: {ex.Message}";
+            ErrorMessage = "Connection error. Please check your internet and try again.";
+            Debug.WriteLine($"[LoginViewModel] Login error: {ex.Message}");
         }
         finally
         {
@@ -90,6 +123,23 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     private async Task NavigateToRegisterAsync()
     {
-        await Shell.Current.GoToAsync("register");
+        try
+        {
+            await Shell.Current.GoToAsync("register");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[LoginViewModel] Navigation error: {ex.Message}");
+        }
+    }
+
+    partial void OnEmailChanged(string value)
+    {
+        ErrorMessage = string.Empty;
+    }
+
+    partial void OnPasswordChanged(string value)
+    {
+        ErrorMessage = string.Empty;
     }
 }

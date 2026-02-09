@@ -1,6 +1,7 @@
 ﻿using AreYouOk.MobileApp.Services;
 using AreYouOk.MobileApp.Pages;
 using AreYouOk.MobileApp.ViewModels;
+using AreYouOk.MobileApp.Data;
 using CommunityToolkit.Maui;
 
 namespace AreYouOk.MobileApp;
@@ -19,19 +20,21 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
 
-		// Register services
+		// Register core services as singletons
 		builder.Services.AddSingleton<SettingsService>();
 		builder.Services.AddSingleton<LocationService>();
+		builder.Services.AddSingleton<DatabaseService>();
+		builder.Services.AddSingleton<NavigationService>();
 		
-		// Configure HttpClient for ApiClient with base address from SettingsService
+		// Configure HttpClient for ApiClient with proper timeout and base address
 		builder.Services.AddHttpClient<ApiClient>((serviceProvider, client) =>
 		{
 			var settingsService = serviceProvider.GetRequiredService<SettingsService>();
 			client.BaseAddress = new Uri(settingsService.ApiBaseUrl);
-			client.Timeout = TimeSpan.FromSeconds(30);
+			client.Timeout = TimeSpan.FromSeconds(60);
 		});
 
-		// Register ViewModels
+		// Register ViewModels as transient (new instance each time)
 		builder.Services.AddTransient<LoginViewModel>();
 		builder.Services.AddTransient<RegisterViewModel>();
 		builder.Services.AddTransient<HomeViewModel>();
@@ -41,7 +44,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<MonitorViewModel>();
 		builder.Services.AddTransient<ProfileViewModel>();
 
-		// Register Pages
+		// Register Pages as transient
 		builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<RegisterPage>();
 		builder.Services.AddTransient<HomePage>();
@@ -50,9 +53,11 @@ public static class MauiProgram
 		builder.Services.AddTransient<HistoryPage>();
 		builder.Services.AddTransient<MonitorPage>();
 		builder.Services.AddTransient<ProfilePage>();
+		builder.Services.AddTransient<MainTabbedPage>();
 
 		return builder.Build();
 	}
 }
+
 
 
