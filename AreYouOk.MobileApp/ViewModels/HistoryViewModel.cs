@@ -12,6 +12,7 @@ namespace AreYouOk.MobileApp.ViewModels;
 public partial class HistoryViewModel : ObservableObject
 {
     private readonly ApiClient _apiClient;
+    private bool _isInitialized = false;
 
     [ObservableProperty]
     private ObservableCollection<JourneyDto> journeys = new();
@@ -84,6 +85,11 @@ public partial class HistoryViewModel : ObservableObject
 
     public async Task InitializeAsync()
     {
-        await LoadHistoryAsync();
+        // Only load on first appearance to avoid blocking UI on tab switches
+        if (!_isInitialized)
+        {
+            _isInitialized = true;
+            await LoadHistoryAsync();
+        }
     }
 }

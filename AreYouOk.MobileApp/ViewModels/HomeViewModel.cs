@@ -16,6 +16,8 @@ public class HomeViewModel : ObservableObject
     private readonly ApiClient _apiClient;
     private readonly SettingsService _settingsService;
     private readonly IServiceProvider _serviceProvider;
+    private bool _isInitialized = false;
+    private bool _isInitializing = false;
 
     private string userName = string.Empty;
     public string UserName
@@ -110,14 +112,16 @@ public class HomeViewModel : ObservableObject
             }
             else
             {
+                // 404 is expected when no active journey - don't treat as error
                 HasActiveJourney = false;
                 ActiveJourney = null;
                 StatusMessage = "You don't have an active journey";
+                System.Diagnostics.Debug.WriteLine($"[HomeVM] No active journey (expected): {response?.ErrorMessage}");
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading journey status: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[HomeVM] LoadActiveJourney Error: {ex.Message}");
             StatusMessage = "Error loading journey status";
         }
         finally
@@ -151,6 +155,26 @@ public class HomeViewModel : ObservableObject
 
     public async Task InitializeAsync()
     {
+        // Prevent duplicate initialization attempts (race condition protection)
+        if (_isInitialized || _isInitializing)
+            return;
+
+        _isInitializing = true;
+        
+        try
+        {
+            await LoadActiveJourneyAsync();
+            _isInitialized = true;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
+    }
+
+    public async Task RefreshStatusAsync()
+    {
+        // Public method to force refresh when needed (e.g., after starting journey)
         await LoadActiveJourneyAsync();
     }
 }

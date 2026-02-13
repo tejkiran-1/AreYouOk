@@ -12,9 +12,10 @@ public partial class MonitorPage : ContentPage
         BindingContext = _viewModel = viewModel;
     }
 
-    protected override async void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitializeAsync();
+        // Fire-and-forget to avoid blocking UI thread
+        _ = _viewModel.InitializeAsync();
     }
 }

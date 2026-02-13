@@ -48,7 +48,16 @@ public class ApiClient
     private async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> action, int maxRetries = 3) where T : class
     {
         var retryPolicy = Policy
-            .Handle<HttpRequestException>()
+            .Handle<HttpRequestException>(ex => 
+            {
+                // Don't retry 404 errors - they're expected when no journey exists
+                if (ex.Message.Contains("404") || ex.Message.Contains("Not Found"))
+                {
+                    Debug.WriteLine($"[ApiClient] 404 Not Found - skipping retries (expected for missing resources)");
+                    return false;
+                }
+                return true;
+            })
             .Or<TaskCanceledException>()
             .WaitAndRetryAsync(
                 maxRetries,
@@ -64,7 +73,15 @@ public class ApiClient
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"[ApiClient] All retries exhausted. Error: {ex.Message}");
+            // Don't spam logs for expected 404s
+            if (ex.Message.Contains("404") || ex.Message.Contains("Not Found"))
+            {
+                Debug.WriteLine($"[ApiClient] Resource not found (404) - this is expected");
+            }
+            else
+            {
+                Debug.WriteLine($"[ApiClient] All retries exhausted. Error: {ex.Message}");
+            }
             throw;
         }
     }

@@ -57,25 +57,26 @@ public partial class ActiveJourneyViewModel : ObservableObject
                 Journey = response.Data;
                 FamilyMembers = new ObservableCollection<FamilyMemberDto>(Journey.FamilyMembers);
                 UpdateTimeDisplay();
-                StartLocationUpdates();
+                
+                // Only start location updates if timer isn't already running
+                if (_locationUpdateTimer == null)
+                {
+                    StartLocationUpdates();
+                }
             }
             else
             {
+                System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] No active journey found: {response?.ErrorMessage}");
                 StatusMessage = "No active journey found";
-                try
-                {
-                    await Shell.Current.Navigation.PopAsync();
-                }
-                catch
-                {
-                    // Ignore navigation errors
-                }
+                StopLocationUpdates();
+                Journey = null;
+                await NavigateBackToHome();
             }
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error: {ex.Message}";
-            System.Diagnostics.Debug.WriteLine($"LoadJourney Error: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] LoadJourney Error: {ex}");
         }
         finally
         {
@@ -87,6 +88,13 @@ public partial class ActiveJourneyViewModel : ObservableObject
     {
         try
         {
+            if (Journey == null)
+            {
+                StatusMessage = "No active journey";
+                await NavigateBackToHome();
+                return;
+            }
+
             IsLoading = true;
 
             var location = await _locationService.GetCurrentLocationAsync();
@@ -104,15 +112,30 @@ public partial class ActiveJourneyViewModel : ObservableObject
             if (response?.Success == true)
             {
                 StatusMessage = isSafe ? "✓ Family members notified you're safe" : "⚠ Alert sent to family members!";
+                
+                // Reload journey to get updated state
                 await LoadJourneyAsync();
             }
             else
             {
-                StatusMessage = "Failed to update status";
+                // Check if journey no longer exists (404 error)
+                if (response?.ErrorMessage?.Contains("404") == true || 
+                    response?.ErrorMessage?.Contains("Not Found") == true)
+                {
+                    System.Diagnostics.Debug.WriteLine("[ActiveJourneyVM] Journey no longer exists - navigating back");
+                    StatusMessage = "Journey has ended";
+                    StopLocationUpdates();
+                    await NavigateBackToHome();
+                }
+                else
+                {
+                    StatusMessage = response?.ErrorMessage ?? "Failed to update status";
+                }
             }
         }
         catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] UpdateSafetyStatus Error: {ex.Message}");
             StatusMessage = $"Error: {ex.Message}";
         }
         finally
@@ -206,23 +229,54 @@ public partial class ActiveJourneyViewModel : ObservableObject
 
     private void StartLocationUpdates()
     {
+        // Stop existing timer if any
+        StopLocationUpdates();
+        
         // Update location every 5 minutes
         _locationUpdateTimer = new System.Threading.Timer(async _ =>
         {
             try
             {
+                // Check if journey still exists
+                if (Journey == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("[ActiveJourneyVM] No journey - stopping location updates");
+                    StopLocationUpdates();
+                    return;
+                }
+
                 var location = await _locationService.GetCurrentLocationAsync();
-                if (location != null && Journey != null)
+                if (location != null)
                 {
                     var updateLocationDto = new UpdateLocationDto
                     {
                         Latitude = location.Latitude,
                         Longitude = location.Longitude
                     };
-                    await _apiClient.UpdateLocationAsync(updateLocationDto);
+                    
+                    var response = await _apiClient.UpdateLocationAsync(updateLocationDto);
+                    
+                    // If journey no longer exists (404), stop updates and navigate back
+                    if (response?.Success == false && 
+                        (response.ErrorMessage?.Contains("404") == true || 
+                         response.ErrorMessage?.Contains("Not Found") == true))
+                    {
+                        System.Diagnostics.Debug.WriteLine("[ActiveJourneyVM] Journey ended - stopping location updates");
+                        StopLocationUpdates();
+                        Journey = null;
+                        
+                        // Navigate back on main thread
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            await NavigateBackToHome();
+                        });
+                    }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] Location update error: {ex.Message}");
+            }
         }, null, TimeSpan.Zero, TimeSpan.FromMinutes(5));
     }
 
@@ -240,8 +294,29 @@ public partial class ActiveJourneyViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Initialize Error: {ex}");
+            System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] Initialize Error: {ex}");
             StatusMessage = "Error loading journey";
+        }
+    }
+
+    private async Task NavigateBackToHome()
+    {
+        try
+        {
+            if (Application.Current?.MainPage?.Navigation != null)
+            {
+                await Application.Current.MainPage.Navigation.PopModalAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[ActiveJourneyVM] Navigation error: {ex.Message}");
+            // Fallback: try going to home tab
+            try
+            {
+                await Shell.Current.GoToAsync("//home");
+            }
+            catch { }
         }
     }
 }
